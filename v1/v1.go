@@ -9,6 +9,9 @@ import (
 // Version 是当前应用程序的版本
 var Version = "1.0.0"
 
+// 全局的 ctx 变量
+var ctx = context.Background()
+
 // 直接导出 Updater 和 Config
 type Updater = updater.Updater
 type Config = updater.Config
@@ -45,21 +48,21 @@ func NewUpdater(config updater.Config) (*updater.Updater, error) {
 }
 
 // CheckForUpdates 检查是否有可用的更新
-func CheckForUpdates(ctx context.Context, u *updater.Updater) (bool, string, error) {
+func CheckForUpdates(u *updater.Updater) (bool, string, error) {
 	return u.CheckForUpdates(ctx)
 }
 
 // UpdateSelf 执行更新操作
-func UpdateSelf(ctx context.Context, u *updater.Updater) error {
+func UpdateSelf(u *updater.Updater) error {
 	return u.UpdateSelf(ctx)
 }
 
 // GetChangelog 获取指定版本的更新日志
-func GetChangelog(ctx context.Context, u *Updater, version string) (string, error) {
+func GetChangelog(u *Updater, version string) (string, error) {
 	return u.GetChangelog(ctx, version)
 }
 
 // GetLatestVersionInfo 获取最新版本的详细信息
-func GetLatestVersionInfo(ctx context.Context, u *Updater) (*LatestVersionInfo, error) {
+func GetLatestVersionInfo(u *Updater) (*LatestVersionInfo, error) {
 	return u.GetLatestVersionInfo(ctx)
 }
