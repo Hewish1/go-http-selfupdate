@@ -13,6 +13,11 @@ type Logger interface {
 	Error(format string, v ...interface{})
 }
 
+type NoOpLogger struct{}
+
+func (l *NoOpLogger) Info(format string, v ...interface{})  {}
+func (l *NoOpLogger) Error(format string, v ...interface{}) {}
+
 // FileLogger 实现了基于文件的日志记录
 type FileLogger struct {
 	logger *log.Logger

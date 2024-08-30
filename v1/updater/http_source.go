@@ -9,18 +9,16 @@ import (
 	"runtime"
 )
 
-// HTTPSource 实现了基于 HTTP/HTTPS 的更新源
+var client = &http.Client{}
+
+// HTTPSource 封装了基于 HTTP 的更新源
 type HTTPSource struct {
-	BaseURL string
-	Client  *http.Client
+	baseURL string
 }
 
 // NewHTTPSource 创建一个新的 HTTPSource 实例
 func NewHTTPSource(baseURL string) *HTTPSource {
-	return &HTTPSource{
-		BaseURL: baseURL,
-		Client:  http.DefaultClient,
-	}
+	return &HTTPSource{baseURL: baseURL}
 }
 
 // LatestVersionInfo 包含最新版本的详细信息
@@ -59,13 +57,13 @@ func (s *HTTPSource) GetLatestVersion(ctx context.Context) (string, error) {
 
 // GetLatestVersionInfo 获取完整的最新版本信息
 func (s *HTTPSource) GetLatestVersionInfo(ctx context.Context) (*LatestVersionInfo, error) {
-	url := fmt.Sprintf("%s/latest.json", s.BaseURL)
+	url := fmt.Sprintf("%s/latest.json", s.baseURL)
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, url, nil)
 	if err != nil {
 		return nil, fmt.Errorf("创建请求失败: %w", err)
 	}
 
-	resp, err := s.Client.Do(req)
+	resp, err := client.Do(req)
 	if err != nil {
 		return nil, fmt.Errorf("发送请求失败: %w", err)
 	}
@@ -101,10 +99,12 @@ func (s *HTTPSource) GetUpdateInfo(ctx context.Context, version string) (*Update
 	}
 
 	return &UpdateInfo{
-		Version:     info.Version,
-		ReleaseDate: info.ReleaseDate,
-		DownloadURL: download.URL,
-		Checksum:    download.MD5,
+		Version:      info.Version,
+		ReleaseDate:  info.ReleaseDate,
+		DownloadURL:  download.URL,
+		Checksum:     download.MD5,
+		Description:  info.Description,
+		ChangelogURL: info.ChangelogURL,
 	}, nil
 }
 
@@ -120,15 +120,20 @@ func (s *HTTPSource) DownloadFile(ctx context.Context, version string) (io.ReadC
 		return nil, fmt.Errorf("创建请求失败: %w", err)
 	}
 
-	resp, err := s.Client.Do(req)
+	req.Header.Add("Accept", "application/octet-stream")
+
+	resp, err := http.DefaultClient.Do(req)
 	if err != nil {
-		return nil, fmt.Errorf("发送请求失败: %w", err)
+		return nil, fmt.Errorf("下载更新文件失败: %w", err)
 	}
 
 	if resp.StatusCode != http.StatusOK {
 		resp.Body.Close()
 		return nil, fmt.Errorf("下载文件失败,状态码: %d", resp.StatusCode)
 	}
+
+	// // 添加日志信息
+	// fmt.Printf("下载文件成功，Content-Length: %d\n", resp.ContentLength)
 
 	return resp.Body, nil
 }
@@ -149,7 +154,7 @@ func (s *HTTPSource) GetChangelog(ctx context.Context, version string) (string, 
 		return "", fmt.Errorf("创建请求失败: %w", err)
 	}
 
-	resp, err := s.Client.Do(req)
+	resp, err := client.Do(req)
 	if err != nil {
 		return "", fmt.Errorf("发送请求失败: %w", err)
 	}

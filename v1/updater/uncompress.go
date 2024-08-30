@@ -70,8 +70,13 @@ func UncompressCommand(src io.Reader, url, cmd string) (io.Reader, error) {
 		if err != nil {
 			return nil, fmt.Errorf("为zip文件创建缓冲区失败: %s", err)
 		}
+		// log.Printf("读取到的文件大小: %d 字节\n", len(buf))
+		if len(buf) < 22 { // ZIP文件至少需要22字节的结束目录记录
+			return nil, fmt.Errorf("ZIP文件太小，可能不完整")
+		}
 
 		r := bytes.NewReader(buf)
+		// log.Println("r", r.Size())
 		z, err := zip.NewReader(r, r.Size())
 		if err != nil {
 			return nil, fmt.Errorf("解压zip文件失败: %s", err)
