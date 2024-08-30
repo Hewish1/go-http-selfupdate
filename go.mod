@@ -1,3 +1,3 @@
-module github.com/hewish1/go-http-selfupdate
+module github.com/ihewish/go-http-selfupdate
 
 go 1.21.0
