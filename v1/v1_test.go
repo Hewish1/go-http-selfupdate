@@ -4,7 +4,7 @@ import (
 	"context"
 	"testing"
 
-	v1 "github.com/hewish1/go-selfupdate/v1"
+	v1 "github.com/hewish1/go-http-selfupdate/v1"
 )
 
 func TestSelfUpdate(t *testing.T) {

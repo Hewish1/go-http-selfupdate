@@ -3,7 +3,7 @@ package v1
 import (
 	"context"
 
-	"github.com/hewish1/go-selfupdate/v1/updater"
+	"github.com/hewish1/go-http-selfupdate/v1/updater"
 )
 
 // Version 是当前应用程序的版本

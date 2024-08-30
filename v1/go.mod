@@ -1,4 +1,4 @@
-module github.com/hewish1/go-selfupdate/v1
+module github.com/hewish1/go-http-selfupdate/v1
 
 go 1.21.0
 
